@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Webex</title>
+  </head>
+  <body>
+    <br />
+    <button id="getRooms">Get Rooms</button>
+    <br />
+    <div id="output"></div>
+    <br />
+    <div>
+      <form id="formid">
+        <div>
+          <p>personal token:</p>
+          <input type="password" id="personaltoken" name="personaltoken" />
+        </div>
+        <div>
+          <p>message:</p>
+          <textarea
+            name="message"
+            id="messagetext"
+            cols="40"
+            rows="4"
+          ></textarea>
+        </div>
+        <div>
+          <button type="submit">Send</button>
+        </div>
+      </form>
+      <br />
+      <p id="outputform"></p>
+    </div>
+
+    <script>
+      document.getElementById("getRooms").addEventListener("click", getRooms);
+
+      function getRooms() {
+        let myHeaders = new Headers();
+        myHeaders.append(
+          "Authorization",
+          "Bearer OTlhYTMyYWUtZTkyZi00ZTdjLWI2NGMtN2FmYzgyNDIwNTE1Yzk4MWQ4ZmItNTlk_PF84_consumer"
+        );
+
+        let requestOptions = {
+          method: "GET",
+          headers: myHeaders,
+          redirect: "follow",
+        };
+
+        fetch("https://webexapis.com/v1/rooms/", requestOptions)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            let output = "";
+            for (let i = 0; i < data.items.length; i++) {
+              output += `
+                <ul id="groupList">
+                    <li>group title: ${data.items[i].title}</li>
+                    <li>type: ${data.items[i].type}</li>
+                    <li>created: ${data.items[i].created}</li>
+                </ul>
+              `;
+            }
+            document.getElementById("getRooms").innerHTML = output;
+          })
+          .catch((error) => console.log("error", error));
+      }
+
+      document.getElementById("formid").addEventListener("submit", sendText);
+
+      function sendText(e) {
+        e.preventDefault();
+        let token = document.getElementById("personaltoken").value;
+        let message = document.getElementById("messagetext").value;
+        /*let roomId =
+          "Y2lzY29zcGFyazovL3VzL1JPT00vZDY2MmVjZjAtMTJkYS0xMWViLWE0NDAtNzVmNGZiY2YyZDlm";*/
+
+        var myHeaders = new Headers();
+        myHeaders.append(
+          "Authorization",
+          "Bearer OTlhYTMyYWUtZTkyZi00ZTdjLWI2NGMtN2FmYzgyNDIwNTE1Yzk4MWQ4ZmItNTlk_PF84_consumer"
+        );
+
+        var formdata = new FormData();
+        formdata.append("text", message.trim());
+        formdata.append(
+          "roomId",
+          "Y2lzY29zcGFyazovL3VzL1JPT00vZDY2MmVjZjAtMTJkYS0xMWViLWE0NDAtNzVmNGZiY2YyZDlm"
+        );
+
+        var requestOptions = {
+          method: "POST",
+          headers: myHeaders,
+          body: formdata,
+          redirect: "follow",
+        };
+
+        fetch("https://webexapis.com/v1/messages", requestOptions)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            var outpuform = ` ${data.text} `;
+            document.getElementById("outputform").innerHTML = outpuform;
+          })
+          .catch((error) => console.log("error", error));
+      }
+    </script>
+  </body>
+</html>
